@@ -11,7 +11,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
       with:
-        node-version: '20'
+        node-version: 20
     - name: Deploy to VPS
       env:
         HOST: ${{ secrets.HOST }}
