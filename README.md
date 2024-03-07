@@ -32,5 +32,11 @@ File changes in the `/functions` directory will automatically be detected, excep
 2. Store the SSH Private Key as a GitHub Secret
     - In your GitHub repository, go to Settings > Secrets > Actions and click on New repository secret.
     - Name the secret SSH_PRIVATE_KEY and paste the contents of the private key file (id_ed25519) as the value.
+    - We will use this in our GitHub Action to authenticate and connect to our VPS server through SSH.
+3. Obtain VPS SSH Host Key
+    - Run  `ssh-keyscan -H [your.server.domain]` on your local machine.
+    - Add the host keys to a new secret in your GitHub repository settings (e.g., SSH_KNOWN_HOSTS).
+    - We will use this to tell our GitHub Action that the VPS server is a known host and we can securely connect to it.
 
 ### Create Github Action
+- Edit the `/.github/workflows/deploy.yml` file according to your needs
