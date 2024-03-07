@@ -8,18 +8,22 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
     steps:
-    - uses: actions/checkout@v3
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Install SSH Key
+      uses: webfactory/ssh-agent@v0.5.0
       with:
-        node-version: 20
+        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
     - name: Deploy to VPS
       env:
-        HOST: ${{ secrets.HOST }}
-        USER: ${{ secrets.USER }}
-        PASSWORD: ${{ secrets.PASSWORD }}
+        VPS_HOST: ${{ secrets.HOST }}
+        VPS_USER: tradeloop
       run: |
-        ssh $USER@$HOST << EOF
-          $PASSWORD
-          cd tradeloop-functions
-          git pull --rebase origin main
-        EOF
+        ssh $VPS_USER@$VPS_HOST '
+          cd ~/tradeloop-functions
+          git pull
+        '
