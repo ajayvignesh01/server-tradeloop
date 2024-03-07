@@ -34,26 +34,6 @@ async function verifyJWT(jwt: string): Promise<boolean> {
 }
 
 serve(async (req: Request) => {
-    if (req.method !== "OPTIONS" && VERIFY_JWT) {
-        try {
-            const token = getAuthToken(req)
-            const isValidJWT = await verifyJWT(token)
-
-            if (!isValidJWT) {
-                return new Response(
-                    JSON.stringify({ msg: "Invalid JWT"}),
-                    { status: 401, headers: { "Content-Type": "application/json" } },
-                )
-            }
-        } catch (e) {
-            console.error(e)
-            return new Response(
-                JSON.stringify({msg: e.toString()}),
-                {status: 401, headers: {"Content-Type": "application/json"}},
-            )
-        }
-    }
-
     const url = new URL(req.url)
     const {pathname} = url
 
@@ -91,6 +71,26 @@ serve(async (req: Request) => {
     //
     // 	return response // 101 (Switching Protocols)
     // }
+
+    if (req.method !== "OPTIONS" && VERIFY_JWT) {
+        try {
+            const token = getAuthToken(req)
+            const isValidJWT = await verifyJWT(token)
+
+            if (!isValidJWT) {
+                return new Response(
+                    JSON.stringify({ msg: "Invalid JWT"}),
+                    { status: 401, headers: { "Content-Type": "application/json" } },
+                )
+            }
+        } catch (e) {
+            console.error(e)
+            return new Response(
+                JSON.stringify({msg: e.toString()}),
+                {status: 401, headers: {"Content-Type": "application/json"}},
+            )
+        }
+    }
 
     const path_parts = pathname.split("/")
     const service_name = path_parts[1]
