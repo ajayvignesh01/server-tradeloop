@@ -1,11 +1,34 @@
 # Tradeloop Edge Functions
 
+## Server
+- Set up a VPS using your desired provider. My favorite for cheap and reliable is [Hetzner's CAX11](https://www.hetzner.com/cloud/).
+- We will be using Ubuntu 22.04 with Docker.
+  - Most cloud providers offer an image with Docker pre-installed.
+  - If that is not the case, you can follow the official guide on [Docker](https://docs.docker.com/engine/install/ubuntu/) to get it set up.
+- After your server is set up, run the following commands from your local terminal:
+  - `ssh root@your_server_domain`
+  - `adduser newusername`
+  - `usermod -aG docker newusername`
+- Make sure to replace `your_server_domain` and `newusername` with your desired values.
+- This will create a new user and allow access to run docker in detached mode.
+- To apply these changes, restart the server.
+
 ## Docker
 
+- SSH into the new user from above
 - Clone this repository: `git clone --depth 1 https://github.com/ajayvignesh01/tradeloop-functions`
-- Copy your edge functions to `./functions` directory.
+- Copy your edge functions to the `./functions` directory.
 - Build the container image: `docker compose up --build -d`
-- Setup Cloudflare Tunnel using: `docker run -d --network host cloudflare/cloudflared:latest tunnel --no-autoupdate run --token eyJhIjoiMmI3ZWU4YTVlYjMwNDI1ZDg2MzA2MWM4OTUwMjk3YjIiLCJ0IjoiYWQ3YzllNmUtMWRkNC00MTMwLThiNDctY2ExZjgzZjI5MDg4IiwicyI6Ik56TXdZVFZpWTJZdE5HVTVNUzAwTXpsaExUa3lPRFl0T1dNeFkyUTNNVFV3T0RGaiJ9`
+- Check if the server is working by making a post request to `your_server_ip:8000/hello-world`
+
+## Domain
+- You need to hava a domain set up on Cloudflare for this step.
+- Navigate to the [Cloudflare Zero Trust Dashboard](https://one.dash.cloudflare.com/).
+- Under the Networks tab, click on Tunnels, and create a new tunnel.
+- Pick Docker as your environment, and you will be shown a command.
+- Insert `-d --network host` after `docker run` and run it in your VPS'
+- Back on Cloudflare, configure your public hostname and enter HTTP://localhost:8000 for service.
+- You should now be able to access your server using your own domain without exposing the VPS IP address.
 
 File changes in the `/functions` directory will automatically be detected, except for the `/main/index.ts` function as it is a long running server.
 
@@ -40,3 +63,9 @@ File changes in the `/functions` directory will automatically be detected, excep
 
 ### Create Github Action
 - Edit the `/.github/workflows/deploy.yml` file according to your needs
+
+Note: Auto deploy will not work on the main function or docker files as it only pulls the new files from github, not restart/redeploy docker.
+
+## Additional Configuration
+- TODO - JWT verification
+- TODO - ENV variables
