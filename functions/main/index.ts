@@ -3,8 +3,10 @@ import {serve} from "https://deno.land/std@0.131.0/http/server.ts";
 
 console.log('main function started')
 
-const JWT_SECRET = Deno.env.get("JWT_SECRET")
-const VERIFY_JWT = Deno.env.get("VERIFY_JWT") === "true"
+// const JWT_SECRET = Deno.env.get("JWT_SECRET")
+const JWT_SECRET = "eja61zN2U5SI74JjFKHD+L+bGA5lLSwhmyIXd8Ffp9E0spiMCWLLNfF401jRKxNCxo84QKE7/htGT6A8UrEqSQ=="
+// const VERIFY_JWT = Deno.env.get("VERIFY_JWT")
+const VERIFY_JWT = true
 
 function getAuthToken(req: Request) {
     const authHeader = req.headers.get("authorization")
