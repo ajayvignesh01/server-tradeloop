@@ -21,10 +21,9 @@ jobs:
     - name: Deploy to VPS
       env:
         VPS_HOST: ${{ secrets.HOST }}
-        VPS_USER: root
+        VPS_USER: tradeloop
       run: |
         ssh $VPS_USER@$VPS_HOST '
-          cd ..
-          cd home/tradeloop/tradeloop-functions
+          cd tradeloop-functions
           git pull
         '
