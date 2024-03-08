@@ -1,4 +1,4 @@
-import * as jose from "https://deno.land/x/jose@v4.14.1/index.ts";
+import { jwtVerify } from "https://deno.land/x/jose@v4.14.1/index.ts";
 import {serve} from "https://deno.land/std@0.131.0/http/server.ts";
 
 console.log('main function started')
@@ -25,7 +25,7 @@ async function verifyJWT(jwt: string): Promise<boolean> {
     const secretKey = encoder.encode(JWT_SECRET)
 
     try {
-        await jose.jwtVerify(jwt, secretKey)
+        await jwtVerify(jwt, secretKey)
     } catch (err) {
         console.error(err)
         return false
