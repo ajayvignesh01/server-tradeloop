@@ -1,12 +1,9 @@
 import { jwtVerify } from "https://deno.land/x/jose@v4.14.1/index.ts";
-import {serve} from "https://deno.land/std@0.131.0/http/server.ts";
 
 console.log('main function started')
 
-// const JWT_SECRET = Deno.env.get("JWT_SECRET")
-const JWT_SECRET = "eja61zN2U5SI74JjFKHD+L+bGA5lLSwhmyIXd8Ffp9E0spiMCWLLNfF401jRKxNCxo84QKE7/htGT6A8UrEqSQ=="
-// const VERIFY_JWT = Deno.env.get("VERIFY_JWT")
-const VERIFY_JWT = true
+const JWT_SECRET = Deno.env.get("SUPABASE_JWT_SECRET")
+const VERIFY_JWT = Deno.env.get("SUPABASE_FUNCTIONS_VERIFY_JWT") === 'true'
 
 function getAuthToken(req: Request) {
     const authHeader = req.headers.get("authorization")
@@ -33,7 +30,7 @@ async function verifyJWT(jwt: string): Promise<boolean> {
     return true
 }
 
-serve(async (req: Request) => {
+Deno.serve(async (req: Request) => {
     const url = new URL(req.url)
     const {pathname} = url
 
@@ -50,28 +47,28 @@ serve(async (req: Request) => {
         return Response.json(metric)
     }
 
-    // NOTE: You can test WebSocket in the main worker by uncommenting below.
-    // if (pathname === '/_internal/ws') {
-    // 	const upgrade = req.headers.get("upgrade") || ""
-    //
-    // 	if (upgrade.toLowerCase() != "websocket") {
-    // 		return new Response("request isn't trying to upgrade to websocket.")
-    // 	}
-    //
-    // 	const { socket, response } = Deno.upgradeWebSocket(req)
-    //
-    // 	socket.onopen = () => console.log("socket opened")
-    // 	socket.onmessage = (e) => {
-    // 		console.log("socket message:", e.data)
-    // 		socket.send(new Date().toString())
-    // 	}
-    //
-    // 	socket.onerror = e => console.log("socket errored:", e.message)
-    // 	socket.onclose = () => console.log("socket closed")
-    //
-    // 	return response // 101 (Switching Protocols)
-    // }
+    if (pathname === '/_internal/ws') {
+    	const upgrade = req.headers.get("upgrade") || ""
+    
+    	if (upgrade.toLowerCase() != "websocket") {
+    		return new Response("request isn't trying to upgrade to websocket.")
+    	}
+    
+    	const { socket, response } = Deno.upgradeWebSocket(req)
+    
+    	socket.onopen = () => console.log("socket opened")
+    	socket.onmessage = (e) => {
+    		console.log("socket message:", e.data)
+    		socket.send(new Date().toString())
+    	}
+    
+    	socket.onerror = e => console.log("socket errored:", e.message)
+    	socket.onclose = () => console.log("socket closed")
+    
+    	return response // 101 (Switching Protocols)
+    }
 
+    // handle jwt
     if (req.method !== "OPTIONS" && VERIFY_JWT) {
         try {
             const token = getAuthToken(req)
@@ -108,7 +105,7 @@ serve(async (req: Request) => {
 
     const createWorker = async () => {
         const memoryLimitMb = 150
-        const workerTimeoutMs = 5 * 60 * 1000
+        const workerTimeoutMs = 5 * 60 * 1000 // 5 minutes
         const noModuleCache = false
 
         // you can provide an import map inline
