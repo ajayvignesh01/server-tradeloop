@@ -1,3 +1,5 @@
+# docker compose up --remove-orphans --build -d
+
 version: "3.9"
 services:
   web:
@@ -6,5 +8,29 @@ services:
       - type: bind
         source: ./functions
         target: /home/deno/functions
+    environment:
+      SUPABASE_URL: ${SUPABASE_URL}
+      SUPABASE_ANON_KEY: ${SUPABASE_ANON_KEY}
+      SUPABASE_SERVICE_ROLE_KEY: ${SUPABASE_SERVICE_ROLE_KEY}
+      SUPABASE_DB_URL: ${SUPABASE_DB_URL}
+      SUPABASE_JWT_SECRET: ${SUPABASE_JWT_SECRET}
+      # TODO: Allow configuring VERIFY_JWT per function. This PR might help: https://github.com/supabase/cli/pull/786
+      SUPABASE_FUNCTIONS_VERIFY_JWT: "false"
+    healthcheck: # TODO: autoheal
+      test: ["CMD", "curl", "-f", "http://localhost:9000/_internal/health"]
+      interval: 5s
+      timeout: 2s
+      retries: 2
+    restart: on-failure
+
+  nginx:
+    image: nginx:latest
+    container_name: nginx
     ports:
-      - "8000:9000"
+      - "8000:80"
+    volumes:
+      - type: bind
+        source: ./nginx.conf
+        target: /etc/nginx/nginx.conf
+    depends_on:
+      - web
