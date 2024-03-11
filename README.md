@@ -1,4 +1,4 @@
-# Tradeloop Edge Functions
+# TradeLoop Server
 
 ## Server
 - Set up a VPS using your desired provider. My favorite for cheap and reliable is [Hetzner's CAX11](https://www.hetzner.com/cloud/).
@@ -16,7 +16,7 @@
 ## Docker
 
 - SSH into the new user from above
-- Clone this repository: `git clone --depth 1 https://github.com/ajayvignesh01/tradeloop-functions`
+- Clone this repository: `git clone --depth 1 https://github.com/ajayvignesh01/server-tradeloop`
 - Copy your edge functions to the `./functions` directory.
 - Build the container image: `docker compose up --build -d`
 - Check if the server is working by making a post request to `your_server_ip:8000/hello-world`
@@ -59,7 +59,7 @@
     - Add the host keys to a new secret in your GitHub repository settings (e.g., SSH_KNOWN_HOSTS).
     - We will use this to tell our GitHub Action that the VPS server is a known host and we can securely connect to it.
 
-### Create Github Action
+### Create GitHub Action
 - Edit the `/.github/workflows/deploy.yml` file according to your needs.
 - This will intiate a zero-downtime redeployment on pushes to main branch.
 

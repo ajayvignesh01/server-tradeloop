@@ -28,7 +28,7 @@ jobs:
         VPS_USER: tradeloop
       run: |
         ssh $VPS_USER@$VPS_HOST '
-          cd tradeloop-functions
-          git pull git@github.com:ajayvignesh01/tradeloop-functions.git
+          cd server-tradeloop
+          git pull git@github.com:ajayvignesh01/server-tradeloop.git
           ./upgrade.sh
         '
