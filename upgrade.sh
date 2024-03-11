@@ -23,7 +23,7 @@ zero_downtime_deploy() {
   reload_nginx
 
   # take the old container offline (handle SIGTERM and set timeout accordingly)
-  docker stop $old_container_id --timeout 10
+  docker stop $old_container_id -t 10
   docker rm $old_container_id
   docker compose up -d --no-deps --scale $service_name=1 --no-recreate $service_name
 
