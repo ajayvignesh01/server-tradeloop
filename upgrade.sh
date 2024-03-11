@@ -12,7 +12,7 @@ zero_downtime_deploy() {
   # wait for new container to be available
   new_container_id=$(docker ps -f name=$service_name -q | head -n1)
   new_container_ip=$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $new_container_id)
-  curl --retry-connrefused --retry 10 --retry-delay 1 --fail $new_container_ip:9000/_internal/health || exit 1
+  curl --retry-connrefused --retry 10 --retry-delay 2 --fail $new_container_ip:9000/_internal/health || exit 1
 
   # # update nginx.conf with the new container IP or hostname
   # # Changes reflected in docker volume, but running `docker exec nginx nginx -T` shows reload still taking old conf

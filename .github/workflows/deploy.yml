@@ -1,4 +1,4 @@
-name: Deploy to Hetzner CAX11 Supabase
+name: zero-downtime redeploy
 
 on:
   push:
@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
+    - name: Checkout Code
       uses: actions/checkout@v4
 
     - name: Install SSH Key
@@ -18,7 +18,7 @@ jobs:
       with:
         ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-    - name: Add SSH host key
+    - name: Add SSH Host Key
       run: |
         echo "${{ secrets.KNOWN_HOSTS }}" >> ~/.ssh/known_hosts
 
