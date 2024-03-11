@@ -11,8 +11,8 @@ services:
       SUPABASE_DB_URL: ${SUPABASE_DB_URL}
       SUPABASE_JWT_SECRET: ${SUPABASE_JWT_SECRET}
       # TODO: Allow configuring VERIFY_JWT per function. This PR might help: https://github.com/supabase/cli/pull/786
-      SUPABASE_FUNCTIONS_VERIFY_JWT: "false"
-    healthcheck: # TODO: autoheal
+      SUPABASE_FUNCTIONS_VERIFY_JWT: ${SUPABASE_FUNCTIONS_VERIFY_JWT}
+    healthcheck: # TODO: auto-heal
       test: ["CMD", "curl", "-f", "http://localhost:9000/_internal/health"]
       interval: 5s
       timeout: 2s

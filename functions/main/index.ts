@@ -1,93 +1,20 @@
-import { jwtVerify } from "https://deno.land/x/jose@v4.14.1/index.ts";
+import { healthCheck } from "../_shared/utils/healthCheck.ts"
+import { handleJWT } from "../_shared/utils/handleJWT.ts"
 
 console.log('main function started')
-
-const JWT_SECRET = Deno.env.get("SUPABASE_JWT_SECRET")
-const VERIFY_JWT = Deno.env.get("SUPABASE_FUNCTIONS_VERIFY_JWT") === 'true'
-
-function getAuthToken(req: Request) {
-    const authHeader = req.headers.get("authorization")
-    if (!authHeader) {
-        throw new Error("Missing authorization header")
-    }
-    const [bearer, token] = authHeader.split(" ")
-    if (bearer !== "Bearer") {
-        throw new Error(`Auth header is not 'Bearer {token}'`)
-    }
-    return token
-}
-
-async function verifyJWT(jwt: string): Promise<boolean> {
-    const encoder = new TextEncoder()
-    const secretKey = encoder.encode(JWT_SECRET)
-
-    try {
-        await jwtVerify(jwt, secretKey)
-    } catch (err) {
-        console.error(err)
-        return false
-    }
-    return true
-}
 
 Deno.serve(async (req: Request) => {
     const url = new URL(req.url)
     const {pathname} = url
 
     // handle health checks
-    if (pathname === '/_internal/health') {
-        return new Response(
-            JSON.stringify({ 'message': 'ok' }),
-            { status: 200, headers: { 'Content-Type': 'application/json' } },
-        )
-    }
-
-    if (pathname === '/_internal/metric') {
-        const metric = await EdgeRuntime.getRuntimeMetrics()
-        return Response.json(metric)
-    }
-
-    if (pathname === '/_internal/ws') {
-    	const upgrade = req.headers.get("upgrade") || ""
-    
-    	if (upgrade.toLowerCase() != "websocket") {
-    		return new Response("request isn't trying to upgrade to websocket.")
-    	}
-    
-    	const { socket, response } = Deno.upgradeWebSocket(req)
-    
-    	socket.onopen = () => console.log("socket opened")
-    	socket.onmessage = (e) => {
-    		console.log("socket message:", e.data)
-    		socket.send(new Date().toString())
-    	}
-    
-    	socket.onerror = e => console.log("socket errored:", e.message)
-    	socket.onclose = () => console.log("socket closed")
-    
-    	return response // 101 (Switching Protocols)
-    }
+    const healthCheckResponse = await healthCheck(req, pathname)
+    if (healthCheckResponse) return healthCheckResponse
 
     // handle jwt
-    if (req.method !== "OPTIONS" && VERIFY_JWT) {
-        try {
-            const token = getAuthToken(req)
-            const isValidJWT = await verifyJWT(token)
-
-            if (!isValidJWT) {
-                return new Response(
-                    JSON.stringify({ msg: "Invalid JWT"}),
-                    { status: 401, headers: { "Content-Type": "application/json" } },
-                )
-            }
-        } catch (e) {
-            console.error(e)
-            return new Response(
-                JSON.stringify({msg: e.toString()}),
-                {status: 401, headers: {"Content-Type": "application/json"}},
-            )
-        }
-    }
+    const handleJWTResponse = await handleJWT(req)
+    if (handleJWTResponse) return handleJWTResponse
+    
 
     const path_parts = pathname.split("/")
     const service_name = path_parts[1]

@@ -27,10 +27,8 @@
 - Under the Networks tab, click on Tunnels, and create a new tunnel.
 - Pick Docker as your environment, and you will be shown a command.
 - Insert `-d --network host` after `docker run` and run it in your VPS'
-- Back on Cloudflare, configure your public hostname and enter HTTP://localhost:8000 for service.
+- Back on Cloudflare, configure your public hostname and enter http://localhost:8000 for service.
 - You should now be able to access your server using your own domain without exposing the VPS IP address.
-
-File changes in the `/functions` directory will automatically be detected, except for the `/main/index.ts` function as it is a long running server.
 
 ## Auto Deploy
 ### Authenticate Git Client on VPS
@@ -45,7 +43,7 @@ File changes in the `/functions` directory will automatically be detected, excep
 3. Add GitHub host key on your VPS
     - On your VPS server, run the following command to fetch the host key of github.com `ssh-keyscan -H github.com`.
     - Open the `~/.ssh/known_hosts` file on your VPS server, and add the host keys.
-    - Run `ssh -T git@github.com` to check, it should outout `Hi your_username! You've successfully authenticated, but GitHub does not provide shell access`
+    - Run `ssh -T git@github.com` to check, it should output `Hi your_username! You've successfully authenticated, but GitHub does not provide shell access`
 
 ### Authenticate VPS SSH on GitHub
 1. Set up SSH Key for Authentication
@@ -57,15 +55,19 @@ File changes in the `/functions` directory will automatically be detected, excep
     - Name the secret SSH_PRIVATE_KEY and paste the contents of the private key file (id_ed25519) as the value.
     - We will use this in our GitHub Action to authenticate and connect to our VPS server through SSH.
 3. Obtain VPS SSH Host Key
-    - Run  `ssh-keyscan -H [your.server.domain]` on your local machine.
+    - Run  `ssh-keyscan -H your_server_domain` on your local machine.
     - Add the host keys to a new secret in your GitHub repository settings (e.g., SSH_KNOWN_HOSTS).
     - We will use this to tell our GitHub Action that the VPS server is a known host and we can securely connect to it.
 
 ### Create Github Action
-- Edit the `/.github/workflows/deploy.yml` file according to your needs
-
-Note: Auto deploy will not work on the main function or docker files as it only pulls the new files from github, not restart/redeploy docker.
+- Edit the `/.github/workflows/deploy.yml` file according to your needs.
+- This will intiate a zero-downtime redeployment on pushes to main branch.
 
 ## Additional Configuration
-- TODO - JWT verification
-- TODO - ENV variables
+### Environment Variables
+- Rename `.env.example` to `.env` and input your environment vairables.
+- Make sure to add any new ones to the `docker-compose.yml` as well.
+
+### JWT Verification
+- You can enable or disable this for all functions by editing the SUPABASE_FUNCTIONS_VERIFY_JWT env variable.
+- In the future you will be able to do this on a per function basis.
