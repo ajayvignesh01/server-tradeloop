@@ -66,7 +66,7 @@
 ## Additional Configuration
 ### Environment Variables
 - Rename `.env.example` to `.env` and input your environment vairables.
-- Make sure to add any new ones to the `docker-compose.yml` as well.
+- Make sure to add any new env variables to the `docker-compose.yml` as well.
 
 ### JWT Verification
 - You can enable or disable this for all functions by editing the SUPABASE_FUNCTIONS_VERIFY_JWT env variable.
